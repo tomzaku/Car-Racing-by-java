@@ -20,14 +20,14 @@ import javax.sound.sampled.UnsupportedAudioFileException;
  * the static variable SoundEffect.volume to mute the sound.
  */
 public enum SoundManager {
-	MNEN("src\\_SOUNDS\\bg.wav"),
-	MONE("src\\_SOUNDS\\one.wav"),
-	MTWO("src\\_SOUNDS\\two.wav"),
-	MTHREE("src\\_SOUNDS\\three.wav"),
-	MSTART("src\\_SOUNDS\\motor_start.wav"),
-	MSTOP("src\\_SOUNDS\\motor_stop.wav"),
-	MGOING("src\\_SOUNDS\\motor_1_armored.wav"),
-	MCLICK("src\\_SOUNDS\\click.wav");
+	MNEN("src/_SOUNDS/bg.wav"),
+	MONE("src/_SOUNDS/one.wav"),
+	MTWO("src/_SOUNDS/two.wav"),
+	MTHREE("src/_SOUNDS/three.wav"),
+	MSTART("src/_SOUNDS/motor_start.wav"),
+	MSTOP("src/_SOUNDS/motor_stop.wav"),
+	MGOING("src/_SOUNDS/motor_1_armored.wav"),
+	MCLICK("src/_SOUNDS/click.wav");
 	
 
 	// Nested class for specifying volume

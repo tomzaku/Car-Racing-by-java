@@ -1,37 +1,51 @@
 package RaceAI.AI;
 
 import java.awt.Point;
+
 import java.util.Random;
 import java.util.Vector;
 
 import RaceAI.RaceClient.Car;
 import RaceAI.RaceClient.Race;
 
+
 public class MainAI {
 	Race race;
 	Vector<Car> All_cars;
 	Car Mycar;
-	
+	int row,column;
+	int direction;
+	Point now,next;
 	public String key = "0000"; // Go-Back-Left-Right (Up - Down - Left - Right)
+	
+	MyMap myMap;  
+	MyCar myCar;
 	
 	public MainAI(Race race, Vector<Car> cars, Car Mycar){
 		this.race = race;
 		this.Mycar = Mycar;
 		this.All_cars = cars;
+		row =race.BlockRow();
+		column = race.BlockColumn();
+		myMap =  new MyMap(row,column);
+		myCar = new MyCar(GlobalVariables.max_trigger);
 	}
-	
-	/// Write your AI here ...
-	// your variants
-	Point last,now,next;
-	Random rand = new Random();
-	int[] ix = {0, 1, 0, -1};
-	int[] iy = {1, 0, -1, 0};
-	
 	//last position
 	double lx=0,ly=0;
 	// last speed
 	double speed = 0;
 	// your AI
+	public int toDirection(int x,int y){
+		switch(x){
+			case 1: return 0; //right
+			case -1: return 2; // left
+		}
+		switch(y){
+			case 1 : return 1; //down
+			case -1: return 3; //top
+		}
+		return 0;
+	}
 	public void AI(){
 		// AI example
 		//Block Index
@@ -47,27 +61,24 @@ public class MainAI {
 			this.key = "0000"; //stop
 			return;
 		}
-		else 
-		if (speed>this.race.BlockSize()*0.02) {
-				this.key = "0100"; //break
-				return;
-			}
-		
+	
+		// End Stop when the car rotation
 		this.now = new Point(x,y);
+
+
 		if (this.next==null) this.next = this.now;
-		if (this.last==null) this.last = this.now;
 		
 		//Next Block Center Coordinate
 		double block_center_x= (this.next.x + 0.5) * this.race.BlockSize();
 		double block_center_y= (this.next.y + 0.5) * this.race.BlockSize();
-		
 		//Car's Direction
 		double v_x = Math.cos(this.Mycar.getalpha() * Math.PI/180);
 		double v_y = Math.sin(this.Mycar.getalpha() * Math.PI/180);
-		
 		//Vector to Next Block Center from Car's position
 		double c_x = block_center_x - this.Mycar.getx();
 		double c_y = block_center_y - this.Mycar.gety();
+
+		direction= toDirection((int)Math.round(v_x),(int)Math.round(v_y));
 		double distance2center = Math.sqrt(c_x*c_x+c_y*c_y);
 		if (distance2center!=0) {
 			//vector normalization
@@ -76,31 +87,16 @@ public class MainAI {
 		}
 		
 		
-		if (distance2center<this.race.BlockSize()*0.2){
+		if (distance2center<this.race.BlockSize()*0.4){
 			this.key = "0000"; //stop
-			// find new next block
-			boolean find=false;
-			{
-				int temp;
-				int i1=rand.nextInt(4);
-				int i2=rand.nextInt(4);
-				temp = ix[i1];
-				ix[i1] = ix[i2];
-				ix[i2] = temp;
-				temp = iy[i1];
-				iy[i1] = iy[i2];
-				iy[i2] = temp;
 				
-			}
-			int i;
-			for (i=0;i<4;i++)
-				if ((last.x!=x+ix[i] || last.y!=y+iy[i]) && this.race.BlockKind(x+ix[i], y+iy[i]) !='1'){
-					find = true;
-					break;
-				}
-			if (find) this.next = new Point(x+ix[i], y+iy[i]);
-			else this.next = this.last;
-			this.last = this.now;
+			if(!myCar.turnback){
+				myMap.saveData(race, this.now );
+			}else{
+				myMap.addWall(this.now,direction);
+			}			
+			this.next = myCar.findNextDirection(myMap, x, y, direction);
+			myMap.printMap();
 		}
 		else {
 			// Go to next block center
